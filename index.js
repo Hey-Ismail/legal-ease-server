@@ -30,12 +30,34 @@ async function run() {
         const db = client.db("lawyers-info")
         const lawyers = db.collection("lawyers")
 
+        //showing all the lawyer 
         app.get("/lawyers", async (req, res) => {
             const cursor = lawyers.find();
             const result = await cursor.toArray();
             res.send(result);
 
         })
+
+        //for banner section
+        app.get("/featured-lawyers", async (req, res) => {
+
+            const result = await lawyers.find({ featured: true }).limit(4).toArray();
+
+            res.send(result);
+
+        });
+        //
+        app.get("/TopLawyerExperts", async (req, res) => {
+
+            const result = await lawyers.find({ featured: true }).limit(6).toArray();
+
+            res.send(result);
+
+        });
+
+
+
+
 
 
         // Send a ping to confirm a successful connection
