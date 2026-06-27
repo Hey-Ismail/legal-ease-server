@@ -32,11 +32,59 @@ async function run() {
 
         //showing all the lawyer 
         app.get("/lawyers", async (req, res) => {
-            const cursor = lawyers.find();
-            const result = await cursor.toArray();
-            res.send(result);
 
-        })
+            const {
+                availability,
+                specialization,
+                sort,
+            } = req.query;
+
+            const query = {};
+
+            // Availability Filter
+            if (availability) {
+                query.availability = availability;
+            }
+
+            // Specialization Filter
+            if (specialization) {
+                query.specialization = specialization;
+            }
+
+            let sortOption = {};
+
+            switch (sort) {
+                case "rating":
+                    sortOption = { rating: -1 };
+                    break;
+
+                case "experience":
+                    sortOption = { experience: -1 };
+                    break;
+
+                case "fee-low":
+                    sortOption = { consultationFee: 1 };
+                    break;
+
+                case "fee-high":
+                    sortOption = { consultationFee: -1 };
+                    break;
+
+                case "newest":
+                    sortOption = { joinedDate: -1 };
+                    break;
+
+                default:
+                    sortOption = {};
+            }
+
+            const result = await lawyers
+                .find(query)
+                .sort(sortOption)
+                .toArray();
+
+            res.send(result);
+        });
 
         //for banner section
         app.get("/featured-lawyers", async (req, res) => {
@@ -54,6 +102,18 @@ async function run() {
             res.send(result);
 
         });
+
+        //fetching lawyers data
+        app.get("/lawyers/:id", async (req, res) => {
+            const id = req.params.id;
+
+            const lawyer = await lawyers.findOne({
+                _id: new ObjectId(id),
+            });
+
+            res.send(lawyer);
+        });
+
 
 
 
