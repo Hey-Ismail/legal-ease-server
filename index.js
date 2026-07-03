@@ -114,6 +114,43 @@ async function run() {
             res.send(lawyer);
         });
 
+        const users = client.db("users-collection");
+        const usersCollection = users.collection("users");
+
+        app.post("/users", async (req, res) => {
+
+            try {
+
+                const user = req.body;
+                const existingUser = await usersCollection.findOne({
+                    email: user.email,
+                });
+
+                if (existingUser) {
+                    return res.status(409).send({
+                        success: false,
+                        message: "User already exists.",
+                    });
+                }
+
+                const result = await usersCollection.insertOne(user);
+
+                res.send({
+                    success: true,
+                    insertedId: result.insertedId,
+                });
+
+            } catch (error) {
+
+                res.status(500).send({
+                    success: false,
+                    message: error.message,
+                });
+
+            }
+        });
+
+
 
 
 
